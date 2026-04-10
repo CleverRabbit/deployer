@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployer & Monitor</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="bg-[#f8f9fa] text-[#333] min-h-screen font-sans">
+    <nav class="navbar sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-[#337ab7] rounded flex items-center justify-center shadow-sm">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight text-[#555]">Deployer</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <% if (typeof user !== 'undefined') { %>
+                        <span class="text-sm text-[#777]"><%= user.email %></span>
+                        <a href="/logout" class="text-sm font-medium text-[#337ab7] hover:underline">Logout</a>
+                    <% } else { %>
+                        <a href="/login" class="text-sm font-medium text-[#337ab7] hover:underline">Login</a>
+                        <a href="/register" class="btn btn-primary px-4 py-2 text-sm">Register</a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <%- body %>
+    </main>
+
+    <footer class="border-t border-[#dee2e6] py-8 mt-auto bg-white">
+        <div class="max-w-7xl mx-auto px-4 text-center text-[#999] text-sm">
+            &copy; 2026 Deployer System. Minimalist & Reliable.
+        </div>
+    </footer>
+</body>
+</html>

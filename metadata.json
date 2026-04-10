@@ -1,0 +1,5 @@
+{
+  "name": "Deployer & Monitor",
+  "description": "Lightweight deployment and monitoring system for Docker projects with Git integration, real-time logs, performance tracking, and Telegram-based activation.",
+  "requestFramePermissions": []
+}

@@ -1,0 +1,193 @@
+<div class="space-y-8">
+    <div class="flex justify-between items-end">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-[#333]">Dashboard</h1>
+            <p class="text-[#777] mt-1">Manage your Docker deployments and monitor performance.</p>
+        </div>
+        <div class="flex gap-2">
+            <button hx-get="/api/system-check" hx-target="#system-check-result" class="btn btn-default px-4 py-2 text-sm flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                System Check
+            </button>
+            <button onclick="document.getElementById('add-modal').classList.remove('hidden')" class="btn btn-primary px-4 py-2 text-sm flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Add Project
+            </button>
+        </div>
+    </div>
+
+    <div id="system-check-result" class="mb-8"></div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% projects.forEach(project => { %>
+            <div class="panel overflow-hidden hover:shadow-md transition-all group">
+                <div class="panel-heading flex justify-between items-center">
+                    <span class="truncate"><%= project.name %></span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider <%= project.status === 'running' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-gray-100 text-gray-600 border border-gray-200' %>">
+                        <%= project.status %>
+                    </span>
+                </div>
+                <div class="panel-body">
+                    <p class="text-xs text-[#999] font-mono truncate mb-4"><%= project.git_url %></p>
+                    
+                    <div class="flex gap-2 mb-4">
+                        <button hx-post="/projects/<%= project.id %>/deploy" hx-target="#output-<%= project.id %>" class="flex-1 btn btn-default py-1.5 text-xs">Deploy</button>
+                        <button hx-post="/projects/<%= project.id %>/stop" hx-target="#output-<%= project.id %>" class="flex-1 btn btn-default py-1.5 text-xs">Stop</button>
+                        <button hx-post="/projects/<%= project.id %>/test" hx-target="#output-<%= project.id %>" class="flex-1 btn btn-default py-1.5 text-xs">Test</button>
+                    </div>
+
+                    <div class="h-24 w-full bg-[#fcfcfc] rounded border border-[#dee2e6] p-2 overflow-y-auto font-mono text-[10px] text-[#666]" id="output-<%= project.id %>">
+                        Waiting for action...
+                    </div>
+                </div>
+
+                <div class="border-t border-[#dee2e6] p-4 bg-[#fcfcfc] flex justify-between items-center">
+                    <div class="flex gap-4">
+                        <div class="text-center">
+                            <div class="text-[10px] text-[#999] uppercase font-bold">CPU</div>
+                            <div class="text-xs font-mono text-[#555]" id="cpu-<%= project.id %>">--%</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-[10px] text-[#999] uppercase font-bold">RAM</div>
+                            <div class="text-xs font-mono text-[#555]" id="ram-<%= project.id %>">--MB</div>
+                        </div>
+                    </div>
+                    <button onclick="showDetails('<%= project.id %>', '<%= project.name %>')" class="text-[#337ab7] hover:underline text-xs font-medium">Details &rarr;</button>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+</div>
+
+<!-- Add Project Modal -->
+<div id="add-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+    <div class="panel w-full max-w-md shadow-xl">
+        <div class="panel-heading flex justify-between items-center">
+            <h2 class="text-lg">Add New Project</h2>
+            <button onclick="document.getElementById('add-modal').classList.add('hidden')" class="text-[#999] hover:text-[#333]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <form hx-post="/projects/add" hx-target="#add-result" class="panel-body space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-[#777] uppercase mb-1">Project Name</label>
+                <input type="text" name="name" required class="form-control w-full px-3 py-2 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-[#777] uppercase mb-1">Git URL</label>
+                <input type="text" name="git_url" required class="form-control w-full px-3 py-2 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-[#777] uppercase mb-1">SSH Passphrase</label>
+                <input type="password" name="ssh_passphrase" class="form-control w-full px-3 py-2 text-sm">
+            </div>
+            <div id="add-result" class="text-sm"></div>
+            <button type="submit" class="btn btn-primary w-full py-2.5 font-bold">Clone & Detect Env</button>
+        </form>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div id="details-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+    <div class="panel w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl flex flex-col">
+        <div class="panel-heading flex justify-between items-center">
+            <h2 class="text-lg" id="details-title">Project Details</h2>
+            <button onclick="closeDetails()" class="text-[#999] hover:text-[#333]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto panel-body space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <h3 class="text-xs font-bold text-[#999] uppercase tracking-widest">Resource Monitoring</h3>
+                    <div class="bg-[#fcfcfc] border border-[#dee2e6] rounded p-4 h-64">
+                        <canvas id="monitor-chart"></canvas>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <h3 class="text-xs font-bold text-[#999] uppercase tracking-widest">Live Logs</h3>
+                    <div class="bg-[#fcfcfc] border border-[#dee2e6] rounded p-4 h-64 overflow-y-auto font-mono text-xs text-[#666]" id="live-logs">
+                        Connecting to log stream...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let chart = null;
+    let logSource = null;
+
+    function showDetails(id, name) {
+        document.getElementById('details-modal').classList.remove('hidden');
+        document.getElementById('details-title').innerText = name;
+        
+        // Init Chart
+        const ctx = document.getElementById('monitor-chart').getContext('2d');
+        if (chart) chart.destroy();
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    { label: 'CPU %', borderColor: '#6366f1', data: [], tension: 0.4 },
+                    { label: 'RAM MB', borderColor: '#10b981', data: [], tension: 0.4 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#27272a' } },
+                    x: { grid: { display: false } }
+                },
+                plugins: { legend: { labels: { color: '#a1a1aa' } } }
+            }
+        });
+
+        // Fetch monitoring data
+        fetch(`/api/monitoring/${id}`)
+            .then(r => r.json())
+            .then(data => {
+                data.forEach(d => {
+                    chart.data.labels.push(new Date(d.timestamp).toLocaleTimeString());
+                    chart.data.datasets[0].data.push(d.cpu_usage);
+                    chart.data.datasets[1].data.push(d.ram_usage);
+                });
+                chart.update();
+            });
+
+        // SSE Logs
+        if (logSource) logSource.close();
+        logSource = new EventSource(`/projects/${id}/logs/stream`);
+        logSource.onmessage = (e) => {
+            const data = JSON.parse(e.data);
+            const logEl = document.getElementById('live-logs');
+            logEl.innerText = data.logs;
+            logEl.scrollTop = logEl.scrollHeight;
+        };
+    }
+
+    function closeDetails() {
+        document.getElementById('details-modal').classList.add('hidden');
+        if (logSource) logSource.close();
+    }
+
+    // Update stats on dashboard
+    setInterval(() => {
+        const projects = document.querySelectorAll('[id^="cpu-"]');
+        projects.forEach(p => {
+            const id = p.id.split('-')[1];
+            fetch(`/api/monitoring/${id}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        const last = data[data.length - 1];
+                        document.getElementById(`cpu-${id}`).innerText = last.cpu_usage.toFixed(1) + '%';
+                        document.getElementById(`ram-${id}`).innerText = last.ram_usage.toFixed(0) + 'MB';
+                    }
+                });
+        });
+    }, 10000);
+</script>

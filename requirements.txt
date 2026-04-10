@@ -1,0 +1,11 @@
+# This project is implemented in Node.js for the AI Studio preview environment.
+# For a Python/Flask implementation, the following dependencies would be used:
+Flask==3.0.0
+gunicorn==21.2.0
+docker==6.1.3
+GitPython==3.1.40
+cryptography==41.0.5
+PyJWT==2.8.0
+bcrypt==4.0.1
+apscheduler==3.10.4
+requests==2.31.0

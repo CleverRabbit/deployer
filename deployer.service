@@ -1,0 +1,15 @@
+[Unit]
+Description=Deployer & Monitor System
+After=network.target docker.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/deployer
+ExecStart=/usr/bin/npm start
+Restart=always
+Environment=NODE_ENV=production
+MemoryMax=300M
+
+[Install]
+WantedBy=multi-user.target

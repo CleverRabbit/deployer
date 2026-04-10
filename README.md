@@ -1,11 +1,30 @@
-<div align="center">
+# Deployer & Monitor
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+Lightweight deployment and monitoring system for Docker projects.
 
-  <h1>Built with AI Studio</h2>
+## Features
+- **Auth**: Token-based activation via email.
+- **Git Integration**: Clone projects with SSH passphrase support (RAM only).
+- **Docker Deploy**: One-click deploy/stop via `docker compose`.
+- **Monitoring**: Real-time CPU/RAM tracking with Chart.js.
+- **Alerts**: Email alerts when resource thresholds are exceeded.
+- **Logs**: Live-streaming logs via SSE.
+- **System Check**: Built-in self-testing for Docker, Git, and SMTP.
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## Installation (Debian 12)
+1. Clone this repo to `/opt/deployer`.
+2. Copy `.env.example` to `.env` and fill in your SMTP credentials.
+3. Run `npm install`.
+4. Copy `deployer.service` to `/etc/systemd/system/`.
+5. Run `systemctl enable --now deployer`.
+6. Set up Nginx using `nginx/nginx.conf`.
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Security
+- SSH passphrases are stored only in memory and cleared after use.
+- Secrets are managed via `.env` files within each project.
+- HTTPS is recommended (Certbot scripts included).
 
-</div>
+## Memory Optimization
+- Flask/Node limit: 300MB.
+- Docker log rotation enabled.
+- Task queue ensures only one heavy operation runs at a time.
